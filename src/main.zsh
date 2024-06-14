@@ -140,7 +140,7 @@ function run_script()
     # The following variables are not local since they may be overriden by callee
     setup_stanza="cd {out_path}; cargo init --vcs none --name ${name}"
     build_stanza="cd {out_path}; cargo build"
-    run_stanza="cd {out_path}; cargo run"
+    run_stanza="{out_path}/target/debug/${name}"
 
     run_script_generic $*
   }
