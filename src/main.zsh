@@ -15,6 +15,8 @@ TAG_OUT_EXECUTABLE="{out_executable}" # The output executable
 BASE_PATH="$(dirname $(whence -p ${NAME}))"
 CACHE_PATH="${HOME}/.cache/${NAME}"
 
+source "${BASE_PATH}/src/lib/logging"
+
 function run_clean()
 {
   rm -rf "${CACHE_PATH}"
@@ -23,8 +25,9 @@ function run_clean()
 # TODO Move this to `src/run-tests.zsh`
 function run_tests()
 {
+  log_info "Running self-tests..."
   for test in "${BASE_PATH}/tests"/*; do
-    echo "Test: '${test}'..."
+    log_info "Test: '${test}'..."
     ${test} || break
   done
 }
@@ -82,7 +85,7 @@ function run_script()
             | sed "s|{out_path}|${out_path}|g" \
             | sed "s|{out_executable}|${out_executable}|g" \
           )
-          echo "${real_command}"
+          log_info "> ${real_command}"
           eval ${real_command}
         done
       fi
@@ -165,11 +168,11 @@ function run_script()
 
 function show_usage()
 {
-  echo "${NAME} --clean"
-  echo "  clean all cache files"
-  echo "${NAME} --tests"
-  echo "  Run all self-tests"
-  echo "More usage documentation to come..." # TODO
+  log_info "${NAME} --clean"
+  log_info "  clean all cache files"
+  log_info "${NAME} --tests"
+  log_info "  Run all self-tests"
+  log_info "More usage documentation to come..." # TODO
 }
 
 case ${1} in
@@ -180,7 +183,7 @@ case ${1} in
     run_tests
     ;;
   --*)
-    echo "ERROR: Unknown flag: ${1}"
+    log_error "${NAME}: Unknown flag: ${1}"
     show_usage
     ;;
   *)

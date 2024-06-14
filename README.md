@@ -1,6 +1,6 @@
 # hash-bang
 
-Turn any program source code into an executable, by adding hash-bang line on the top
+Turn any program source code into an executable, by adding hash-bang (aka https://en.wikipedia.org/wiki/Shebang_(Unix)) line on the top
 
 The dependency and build process is taken care of.
 
