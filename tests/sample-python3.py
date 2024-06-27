@@ -1,4 +1,4 @@
-#!/usr/bin/env hash-bang python3
+#!/usr/bin/env -S hash-bang python3
 
 # hash-bang:setup: python3 -m pip install termcolor
 

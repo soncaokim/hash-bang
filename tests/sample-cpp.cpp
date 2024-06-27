@@ -1,4 +1,4 @@
-#!/usr/bin/env hash-bang cpp
+#!/usr/bin/env -S hash-bang cpp
 
 #include <iostream>
 
