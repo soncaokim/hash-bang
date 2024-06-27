@@ -12,7 +12,7 @@ TAG_SRC_FILE="{src_file}" # The source script, but without hash-bang stanza
 TAG_OUT_PATH="{out_path}" # The output path, cached
 TAG_OUT_EXECUTABLE="{out_executable}" # The output executable
 
-BASE_PATH="$(dirname $(whence -p ${NAME}))"
+BASE_PATH="$(dirname $(whence -p ${NAME}))/.."
 CACHE_PATH="${HOME}/.cache/${NAME}"
 
 source "${BASE_PATH}/src/lib/logging"
@@ -175,6 +175,12 @@ function show_usage()
   log_info "More usage documentation to come..." # TODO
 }
 
+if [ $# -le 0 ]; then
+  log_error "${NAME}: Missing argument"
+  show_usage
+  exit 1
+fi
+
 case ${1} in
   --clean)
     run_clean
@@ -185,6 +191,7 @@ case ${1} in
   --*)
     log_error "${NAME}: Unknown flag: ${1}"
     show_usage
+    exit 1
     ;;
   *)
     run_script $*
