@@ -1,0 +1,14 @@
+# Specialized runner for C++
+
+source "${BASE_PATH}/src/runner/_default"
+
+function run_script_specialized()
+{
+  # The following variables are not local since they may be overriden by callee
+  # TODO Enable optimization and strip debug symbols
+  build_stanza="g++ {src_file} -o {out_executable}"
+  run_stanza="{out_executable}"
+
+  run_script_default $*
+}
+

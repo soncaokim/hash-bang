@@ -1,0 +1,84 @@
+# Default runner
+
+TAG_SETUP="setup"
+TAG_BUILD="build"
+TAG_RUN="run"
+TAG_CLEANUP="cleanup"
+
+TAG_SRC_FILE="{src_file}" # The source script, but without hash-bang stanza
+TAG_OUT_PATH="{out_path}" # The output path, cached
+TAG_OUT_EXECUTABLE="{out_executable}" # The output executable
+
+function run_script_default()
+{
+  local script_file=$1
+  local script_ext=${script_file:t:e}
+  shift
+  local script_args=$*
+
+  local script_hash="$(md5sum "${script_file}" | cut -d' ' -f1)"
+  local out_path="${CACHE_PATH}/${script_hash}"
+  local src_file="${out_path}/src_file.${script_ext}"
+  local out_executable="${out_path}/out_executable"
+
+  function extract_script_stanza()
+  {
+    local tag=$1
+    grep "${NAME}:${tag}:" ${script_file} | sed "s/^.*${NAME}:${tag}://g"
+  }
+
+  # Extract the script-specific stanzas
+  local script_setup_stanza="$(extract_script_stanza ${TAG_SETUP})"
+  local script_build_stanza="$(extract_script_stanza ${TAG_BUILD})"
+  local script_run_stanza="$(extract_script_stanza ${TAG_RUN})"
+  local script_cleanup_stanza="$(extract_script_stanza ${TAG_CLEANUP})"
+  # TODO Other script-specific stanzas as well, i.e. lint/perf-test
+
+  # Extract a clean source file (without any hash-bang stanza)
+  # Replace the first line (containing hash-bang) by an empty line
+  # Replace any hash-bang stanzas by equivalent number of empty lines
+  # This allow stable reference of compile/run errors to source code
+  mkdir -p "${out_path}"
+  sed '1s/.*//g' ${script_file} \
+    | sed "s/^.*${NAME}:.*$//g" \
+    > ${src_file}
+
+  # Override default if the script contains a specific stanza
+  [[ -n "${script_setup_stanza}" ]] && setup_stanza="${setup_stanza}; ${script_setup_stanza}"
+  [[ -n "${script_build_stanza}" ]] && build_stanza="${build_stanza}; ${script_build_stanza}"
+  [[ -n "${script_run_stanza}" ]] && run_stanza="${run_stanza}; ${script_run_stanza}"
+  [[ -n "${script_cleanup_stanza}" ]] && cleanup_stanza="${cleanup_stanza}; ${script_cleanup_stanza}"
+
+  function execute_stanza()
+  {
+    local commands="$*"
+    if [[ -n "${commands}" ]]; then
+      echo "${commands}" | while read command; do
+      local real_command=$(echo "${command}" \
+          | sed "s|{src_file}|${src_file}|g" \
+          | sed "s|{out_path}|${out_path}|g" \
+          | sed "s|{out_executable}|${out_executable}|g" \
+        )
+        log_info "${NAME} > ${real_command}"
+        eval ${real_command}
+      done
+    fi
+  }
+
+  function execute_stanza_with_guard()
+  {
+    local guard_file=$1
+    shift
+    if [ ! -r "${guard_file}" -o "${script_file}" -nt "${guard_file}" ]; then
+      execute_stanza $* \
+        && touch "${guard_file}"
+    fi
+  }
+
+  # Dont rerun setup and build if the source files hasnt changed
+  execute_stanza_with_guard "${out_path}/setup_guard" ${setup_stanza} \
+    && execute_stanza_with_guard "${out_path}/build_guard" ${build_stanza} \
+    && execute_stanza ${run_stanza} \
+    && execute_stanza ${cleanup_stanza}
+}
+

@@ -1,0 +1,19 @@
+# Specialized runner for Python3
+
+source "${BASE_PATH}/src/runner/_default"
+
+function run_script_specialized()
+{
+  # The following variables are not local since they may be overriden by callee
+  setup_stanza="python3 -m venv {out_path};"
+  setup_stanza+="source {out_path}/bin/activate"
+
+  run_stanza="source {out_path}/bin/activate;"
+  run_stanza+="python3 {src_file}"
+
+  cleanup_stanza="deactivate"
+
+  run_script_default $*
+}
+
+
