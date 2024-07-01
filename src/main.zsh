@@ -10,6 +10,7 @@ source "${BASE_PATH}/src/lib/logging"
 
 function run_clean()
 {
+  log_info "${NAME}: Cleaning '${CACHE_PATH}'..."
   rm -rf "${CACHE_PATH}"
 }
 
@@ -42,6 +43,7 @@ function run_script()
 
 function show_usage()
 {
+  log_info "Usage:"
   log_info "${NAME} --clean"
   log_info "  clean all cache files"
   log_info "${NAME} --tests"
