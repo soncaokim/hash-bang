@@ -34,6 +34,7 @@ function run_script()
     shift
     run_script_specialized $*
   else
+    # TODO Guess the runner based on file extension
     log_info "${NAME}: Using default runner..."
     source "${BASE_PATH}/src/runner/_default"
 
@@ -60,6 +61,10 @@ fi
 case ${1} in
   --clean)
     run_clean
+    ;;
+  --help)
+    show_usage
+    exit 0
     ;;
   --tests)
     run_tests
