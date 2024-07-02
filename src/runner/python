@@ -1,4 +1,4 @@
-# Specialized runner for Python3
+# Specialized runner for Python
 
 source "${BASE_PATH}/src/runner/_default"
 
