@@ -45,11 +45,17 @@ function run_script()
 function show_usage()
 {
   log_info "Usage:"
-  log_info "${NAME} --clean"
-  log_info "  clean all cache files"
-  log_info "${NAME} --tests"
-  log_info "  Run all self-tests"
-  log_info "More usage documentation to come..." # TODO
+  log_info "This program is not intended to be used directly, but instead as a 'shebang' interpreter."
+  log_info "i.e Add '#!/usr/bin/env ${NAME}' in the beginning of your text file"
+  log_info
+  log_info "See ${BASE_PATH}/tests/sample-* files for usage sample."
+  log_info
+  log_info "Nevertheless, you can still invoke the program directly, as per below:"
+  log_info "  ${NAME} --help"
+  log_info "  ${NAME} --clean"
+  log_info "    clean all cache files"
+  log_info "  ${NAME} --tests"
+  log_info "    Run all self-tests"
 }
 
 if [ $# -le 0 ]; then
