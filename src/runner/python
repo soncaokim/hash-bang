@@ -9,7 +9,7 @@ function run_script_specialized()
   setup_stanza+="source {out_path}/bin/activate"
 
   run_stanza="source {out_path}/bin/activate;"
-  run_stanza+="python3 {src_file}"
+  run_stanza+="python3 {src_file} {args}"
 
   cleanup_stanza="deactivate"
 

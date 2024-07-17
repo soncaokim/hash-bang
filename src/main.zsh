@@ -20,7 +20,11 @@ function run_tests()
   log_info "${NAME}: Running self-tests..."
   for test in "${BASE_PATH}/tests"/*; do
     log_info "${NAME}: Test '${test}'..."
-    ${test} || break
+    ${test}
+    if [ $? -ne 0 ]; then
+      log_error "${NAME}: Test failed"
+      break
+    fi
   done
 }
 
