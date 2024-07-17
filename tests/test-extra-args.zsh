@@ -3,6 +3,8 @@
 # Check that the extra args are passed though
 # From hash-bang wrapper to the recipient program
 
+#set -x
+
 function test_cpp()
 {
   local tmpfile="$(mktemp test_XXXX).cpp"
@@ -30,7 +32,7 @@ int main(int count, const char * values[]) {
 EOF
   chmod +x "${tmpfile}"
 
-  "${tmpfile}" arg1 arg2 arg3 \
+  "./${tmpfile}" arg1 arg2 arg3 \
     && rm ${tmpfile} ${tmpfile:r}
 }
 
@@ -53,7 +55,7 @@ else:
 EOF
   chmod +x "${tmpfile}"
 
-  "${tmpfile}" arg1 arg2 arg3 \
+  "./${tmpfile}" arg1 arg2 arg3 \
     && rm ${tmpfile} ${tmpfile:r}
 }
 
@@ -81,7 +83,7 @@ fn main() {
 EOF
   chmod +x "${tmpfile}"
 
-  "${tmpfile}" arg1 arg2 arg3 \
+  "./${tmpfile}" arg1 arg2 arg3 \
     && rm ${tmpfile} ${tmpfile:r}
 }
 
