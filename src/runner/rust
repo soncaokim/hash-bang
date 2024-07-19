@@ -4,9 +4,10 @@ source "${BASE_PATH}/src/runner/_default"
 
 function run_script_specialized()
 {
-  local name=${1:t:r} # get the name from the script file name
+  #local name=${1:t:r} # get the name from the script file name
+  local name=out_executable
   # The following variables are not local since they may be overriden by callee
-  setup_stanza="cd {out_path}; rm -rf ./Cargo*; cargo init --vcs none --name ${name};"
+  setup_stanza="cd {out_path}; test -f Cargo.toml || cargo init --vcs none --name ${name};"
   setup_stanza+="mv {src_file} {out_path}/src/main.rs"
   build_stanza="cd {out_path}; cargo build --release"
   run_stanza="{out_path}/target/release/${name} {args}"

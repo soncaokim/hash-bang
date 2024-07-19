@@ -79,7 +79,6 @@ fn main() {
         false => {println!("Mismatching argument. Expected={:#?} vs received={:#?}", expected, received); process::exit(1)},
     }
 }
-
 EOF
   chmod +x "${tmpfile}"
 
