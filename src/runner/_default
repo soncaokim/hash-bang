@@ -55,14 +55,22 @@ function run_script_default()
     local commands=$@
     if [[ -n "${commands}" ]]; then
       local script_args_quoted=""
-      i=1
-      while [ $i -le ${#script_args} ]; do
-        script_args_quoted+='"'
-        script_args_quoted+=${script_args[$i]}
-        script_args_quoted+='" '
-        i=$((i+1))
-      done
+      {
+        local i=1
+        local arg_escaped
+        while [ $i -le ${#script_args} ]; do
+          script_args_quoted+='"'
 
+          # '&' has special meaning for sed, so make sure it's interpreted as a literal '&'
+          arg_escaped="${script_args[$i]}"
+          arg_escaped="${arg_escaped:gs/&/\\&}"
+
+          script_args_quoted+="${arg_escaped}"
+          script_args_quoted+='" '
+
+          i=$((i+1))
+        done
+      }
       echo "${commands}" | while read command; do
         local real_command=$(echo "${command}" \
           | sed "s|{src_file}|${src_file}|g" \
