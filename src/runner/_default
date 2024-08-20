@@ -15,7 +15,7 @@ function run_script_default()
   local script_file=$1
   local script_ext=${script_file:t:e}
   shift
-  local script_args=$*
+  local script_args=("$@")
 
   local script_hash="$(md5sum "${script_file}" | cut -d' ' -f1)"
   local out_path="${CACHE_PATH}/${script_hash}"
@@ -52,14 +52,23 @@ function run_script_default()
 
   function execute_stanza()
   {
-    local commands="$*"
+    local commands=$@
     if [[ -n "${commands}" ]]; then
+      local script_args_quoted=""
+      i=1
+      while [ $i -le ${#script_args} ]; do
+        script_args_quoted+='"'
+        script_args_quoted+=${script_args[$i]}
+        script_args_quoted+='" '
+        i=$((i+1))
+      done
+
       echo "${commands}" | while read command; do
-      local real_command=$(echo "${command}" \
+        local real_command=$(echo "${command}" \
           | sed "s|{src_file}|${src_file}|g" \
           | sed "s|{out_path}|${out_path}|g" \
           | sed "s|{out_executable}|${out_executable}|g" \
-          | sed "s|{args}|${script_args}|g" \
+          | sed "s|{args}|${script_args_quoted}|g" \
         )
         log_info "${NAME} > ${real_command}"
         eval ${real_command}
@@ -72,7 +81,7 @@ function run_script_default()
     local guard_file=$1
     shift
     if [ ! -r "${guard_file}" -o "${script_file}" -nt "${guard_file}" ]; then
-      execute_stanza $* \
+      execute_stanza $@ \
         && touch "${guard_file}"
     fi
   }

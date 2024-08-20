@@ -12,6 +12,6 @@ function run_script_specialized()
   build_stanza="cd {out_path}; cargo build --release"
   run_stanza="{out_path}/target/release/${name} {args}"
 
-  run_script_default $*
+  run_script_default $@
 }
 

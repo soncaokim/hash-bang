@@ -36,13 +36,13 @@ function run_script()
     source "${BASE_PATH}/src/runner/${runner}"
 
     shift
-    run_script_specialized $*
+    run_script_specialized $@
   else
     # TODO Guess the runner based on file extension
     log_info "${NAME}: Using default runner..."
     source "${BASE_PATH}/src/runner/_default"
 
-    run_script_default $*
+    run_script_default $@
   fi
 }
 
@@ -85,7 +85,7 @@ case ${1} in
     exit 1
     ;;
   *)
-    run_script $*
+    run_script $@
     ;;
 esac
 

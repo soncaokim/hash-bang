@@ -8,6 +8,6 @@ function run_script_specialized()
   build_stanza="g++ {src_file} -o {out_executable} -Wall -Wextra -g -O3"
   run_stanza="{out_executable} {args}"
 
-  run_script_default $*
+  run_script_default $@
 }
 
