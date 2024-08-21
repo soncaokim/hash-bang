@@ -5,6 +5,10 @@
 
 #set -x
 
+arg1="arg"
+arg2="arg with space" # with spaces
+arg3="arg !@#$%^&*()-+<>[]{}/" # with special characters
+
 function test_cpp()
 {
   local tmpfile="$(mktemp test_XXXX).cpp"
@@ -21,7 +25,7 @@ int main(int count, const char * values[]) {
     received << "<" << values[i] << "> ";
   }
 
-  std::string expected("<arg1> <arg2 with space> <arg3> ");
+  std::string expected("<${arg1}> <${arg2}> <${arg3}> ");
   if (received.str() != expected) {
     std::cerr << "Mismatching argument. Expected=" << expected << " vs received=" << received.str() << std::endl;
     return 1;
@@ -32,7 +36,7 @@ int main(int count, const char * values[]) {
 EOF
   chmod +x "${tmpfile}"
 
-  "./${tmpfile}" arg1 "arg2 with space" arg3 \
+  "./${tmpfile}" arg "${arg2}" "${arg3}" \
     && rm ${tmpfile} ${tmpfile:r}
 }
 
@@ -45,7 +49,7 @@ function test_python()
 import sys
 
 received = sys.argv[1:] # skip the first argument being the program nane
-expected = ['arg1', 'arg2 with space', 'arg3']
+expected = ['${arg1}', '${arg2}', '${arg3}']
 
 if received != expected:
   print(f"Mismatching argument. Expected={expected} vs received={received}")
@@ -55,7 +59,7 @@ else:
 EOF
   chmod +x "${tmpfile}"
 
-  "./${tmpfile}" arg1 "arg2 with space" arg3 \
+  "./${tmpfile}" arg "${arg2}" "${arg3}" \
     && rm ${tmpfile} ${tmpfile:r}
 }
 
@@ -72,7 +76,7 @@ fn main() {
     let args : Vec<String> = env::args().collect();
     let received = &args[1..];
     //println!("{:#?}", received);
-    let expected = vec!("arg1", "arg2 with space", "arg3");
+    let expected = vec!("${arg1}", "${arg2}", "${arg3}");
 
     match expected == received {
         true => {process::exit(0)},
@@ -82,7 +86,7 @@ fn main() {
 EOF
   chmod +x "${tmpfile}"
 
-  "./${tmpfile}" arg1 "arg2 with space" arg3 \
+  "./${tmpfile}" arg "${arg2}" "${arg3}" \
     && rm ${tmpfile} ${tmpfile:r}
 }
 
