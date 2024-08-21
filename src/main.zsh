@@ -32,14 +32,14 @@ function run_script()
 {
   local runner="$1"
   if [ -f "${BASE_PATH}/src/runner/${runner}" ]; then
-    log_info "${NAME}: Using runner '${runner}'..."
+    #log_info "${NAME}: Using runner '${runner}'..."
     source "${BASE_PATH}/src/runner/${runner}"
 
     shift
     run_script_specialized $@
   else
     # TODO Guess the runner based on file extension
-    log_info "${NAME}: Using default runner..."
+    #log_info "${NAME}: Using default runner..."
     source "${BASE_PATH}/src/runner/_default"
 
     run_script_default $@
