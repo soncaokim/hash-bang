@@ -45,6 +45,7 @@ function run_script_default()
     > ${src_file}
 
   # Override default if the script contains a specific stanza
+  run_stanza="cd ${out_path}; ${run_stanza}"
   [[ -n "${script_setup_stanza}" ]] && setup_stanza="${setup_stanza}; ${script_setup_stanza}"
   [[ -n "${script_build_stanza}" ]] && build_stanza="${build_stanza}; ${script_build_stanza}"
   [[ -n "${script_run_stanza}" ]] && run_stanza="${run_stanza}; ${script_run_stanza}"
