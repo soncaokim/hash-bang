@@ -7,12 +7,54 @@ BASE_PATH=${0:A:h:h} # ':A' gives the pathname, ':h' gives the parent
 CACHE_PATH="${HOME}/.cache/${NAME}"
 LOG_FILE="${NAME}_log.csv"
 
+source "${BASE_PATH}/src/lib/hash"
 source "${BASE_PATH}/src/lib/logging"
 
 function run_clean()
 {
-  log_info "${NAME}: Cleaning '${CACHE_PATH}'..."
-  rm -rf "${CACHE_PATH}"
+  # Brutal clean
+  function clean_all()
+  {
+    rm -rf "${CACHE_PATH}"
+  }
+
+  # clean obsolete cache folders (ie. the signature doesnt match with source files anymore)
+  function clean_obsoletes()
+  {
+    for d in ${CACHE_PATH}/*; do
+      [ ! -d ${d} ] && continue
+
+      [ ! -f ${d}/${LOG_FILE} ] && {
+        log_info "${NAME}: Cleaning '${d}' (obsolete cache dir structure)..."
+        rm -rf ${d}
+        continue
+      }
+
+      local last_log="$(grep -E '^run;' ${d}/${LOG_FILE} | tail -1)"
+      [ -z "${last_log}" ] && {
+        log_warn "${NAME}: Preserve '${d}' (never ran)..."
+        #rm -rf ${d}
+        continue
+      }
+
+      local tokens=( "${(@s/;/)last_log}" ) # split by ';'
+      (( ${#tokens[@]} != 6 )) && {
+        log_info "${NAME}: Cleaning '${d}' (obsolete log file structure)..."
+        rm -rf ${d}
+        continue
+      }
+
+      local script_pathname="${tokens[5]}"
+      local script_hash=$(file_hash "${script_pathname}")
+      [[ "${d:t}" != "${script_hash}" ]] && {
+        log_info "${NAME}: Cleaning '${d}' (hash not matching source file '${script_pathname}')..."
+        rm -rf ${d}
+        continue
+      }
+    done
+  }
+
+  clean_obsoletes
 }
 
 # TODO Move this to `src/run-tests.zsh`

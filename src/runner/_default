@@ -1,5 +1,7 @@
 # Default runner
 
+source "${BASE_PATH}/src/lib/hash"
+source "${BASE_PATH}/src/lib/logging"
 zmodload zsh/datetime
 
 TAG_SETUP="setup"
@@ -14,7 +16,8 @@ TAG_ARGS="{args}" # The recipient program arguments
 
 function run_script_default()
 {
-  local script_file=$1
+  local script_file="$1"
+  script_file="$(realpath ${script_file})"
   shift
   local script_ext=${script_file:t:e}
   [ -n "${script_ext}" ] && script_ext=".${script_ext}"
@@ -22,7 +25,7 @@ function run_script_default()
 
   local script_cwd="$(pwd)"
 
-  local script_hash="$(md5sum "${script_file}" | cut -d' ' -f1)"
+  local script_hash="$(file_hash ${script_file})"
   local out_path="${CACHE_PATH}/${script_hash}"
   local src_file="${out_path}/src_file${script_ext}"
   local out_executable="${out_path}/out_executable"
@@ -96,7 +99,7 @@ function run_script_default()
       # Logging
       local timestamp_Z
       typeset -F timestamp_Z=${EPOCHREALTIME}
-      echo "${step_name};${timestamp_A};$(( timestamp_Z - timestamp_A ));${script_cwd};${script_file} ${script_args}" >> ${out_path}/${LOG_FILE}
+      echo "${step_name};${timestamp_A};$(( timestamp_Z - timestamp_A ));${script_cwd};${script_file};${script_args}" >> ${out_path}/${LOG_FILE}
     fi
   }
 
@@ -114,7 +117,7 @@ function run_script_default()
 
   # Create log file if needed
   [ ! -f ${out_path}/${LOG_FILE} ] && {
-    echo 'step;start;duration;cwd;cmd' > ${out_path}/${LOG_FILE}
+    echo 'step;start;duration;cwd;cmd_abspathname;args' > ${out_path}/${LOG_FILE}
   }
 
   # Dont rerun setup and build if the source files hasnt changed
