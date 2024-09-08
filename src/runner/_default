@@ -1,5 +1,7 @@
 # Default runner
 
+zmodload zsh/datetime
+
 TAG_SETUP="setup"
 TAG_BUILD="build"
 TAG_RUN="run"
@@ -13,13 +15,16 @@ TAG_ARGS="{args}" # The recipient program arguments
 function run_script_default()
 {
   local script_file=$1
-  local script_ext=${script_file:t:e}
   shift
+  local script_ext=${script_file:t:e}
+  [ -n "${script_ext}" ] && script_ext=".${script_ext}"
   local script_args=("$@")
+
+  local script_cwd="$(pwd)"
 
   local script_hash="$(md5sum "${script_file}" | cut -d' ' -f1)"
   local out_path="${CACHE_PATH}/${script_hash}"
-  local src_file="${out_path}/src_file.${script_ext}"
+  local src_file="${out_path}/src_file${script_ext}"
   local out_executable="${out_path}/out_executable"
 
   function extract_script_stanza()
@@ -53,8 +58,13 @@ function run_script_default()
 
   function execute_stanza()
   {
+    local step_name=$1
+    shift
     local commands=$@
     if [[ -n "${commands}" ]]; then
+      local timestamp_A
+      typeset -F timestamp_A=${EPOCHREALTIME}
+
       local script_args_quoted=""
       {
         local i=1
@@ -82,23 +92,35 @@ function run_script_default()
         #log_info "${NAME} > ${real_command}"
         eval ${real_command}
       done
+
+      # Logging
+      local timestamp_Z
+      typeset -F timestamp_Z=${EPOCHREALTIME}
+      echo "${step_name};${timestamp_A};$(( timestamp_Z - timestamp_A ));${script_cwd};${script_file} ${script_args}" >> ${out_path}/${LOG_FILE}
     fi
   }
 
   function execute_stanza_with_guard()
   {
+    local step_name=$1
+    shift
     local guard_file=$1
     shift
     if [ ! -r "${guard_file}" -o "${script_file}" -nt "${guard_file}" ]; then
-      execute_stanza $@ \
+      execute_stanza ${step_name} $@ \
         && touch "${guard_file}"
     fi
   }
 
+  # Create log file if needed
+  [ ! -f ${out_path}/${LOG_FILE} ] && {
+    echo 'step;start;duration;cwd;cmd' > ${out_path}/${LOG_FILE}
+  }
+
   # Dont rerun setup and build if the source files hasnt changed
-  execute_stanza_with_guard "${out_path}/setup_guard" ${setup_stanza} \
-    && execute_stanza_with_guard "${out_path}/build_guard" ${build_stanza} \
-    && execute_stanza ${run_stanza} \
-    && execute_stanza ${cleanup_stanza}
+  execute_stanza_with_guard setup "${out_path}/${NAME}_setup-guard" ${setup_stanza} \
+    && execute_stanza_with_guard build "${out_path}/${NAME}_build-guard" ${build_stanza} \
+    && execute_stanza run ${run_stanza} \
+    && execute_stanza cleanup ${cleanup_stanza}
 }
 

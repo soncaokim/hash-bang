@@ -5,6 +5,7 @@ NAME="hash-bang"
 
 BASE_PATH=${0:A:h:h} # ':A' gives the pathname, ':h' gives the parent
 CACHE_PATH="${HOME}/.cache/${NAME}"
+LOG_FILE="${NAME}_log.csv"
 
 source "${BASE_PATH}/src/lib/logging"
 
