@@ -21,7 +21,9 @@ function run_clean()
   # clean obsolete cache folders (ie. the signature doesnt match with source files anymore)
   function clean_obsoletes()
   {
-    for d in ${CACHE_PATH}/*; do
+    for d in $(ls ${CACHE_PATH}); do
+      d=${CACHE_PATH}/${d}
+
       [ ! -d ${d} ] && continue
 
       [ ! -f ${d}/${LOG_FILE} ] && {
