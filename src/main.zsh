@@ -32,8 +32,8 @@ function run_clean()
 
       local last_log="$(grep -E '^run;' ${d}/${LOG_FILE} | tail -1)"
       [ -z "${last_log}" ] && {
-        log_warn "${NAME}: Preserve '${d}' (never ran)..."
-        #rm -rf ${d}
+        log_warn "${NAME}: Cleaning '${d}' (never ran)..."
+        rm -rf ${d}
         continue
       }
 
