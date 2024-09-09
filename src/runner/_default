@@ -65,8 +65,10 @@ function run_script_default()
     shift
     local commands=$@
     if [[ -n "${commands}" ]]; then
+      # Logging, without the duration
       local timestamp_A
       typeset -F timestamp_A=${EPOCHREALTIME}
+      echo "${step_name};${timestamp_A};;${script_cwd};${script_file};${script_args}" >> ${out_path}/${LOG_FILE}
 
       local script_args_quoted=""
       {
