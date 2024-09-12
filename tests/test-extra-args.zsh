@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 
 # Check that the extra args are passed though
-# From hash-bang wrapper to the recipient program
+# From playbook wrapper to the recipient program
 
 #set -x
 
@@ -13,7 +13,7 @@ function test_cpp()
 {
   local tmpfile="$(mktemp test_XXXX).cpp"
   cat << EOF > "${tmpfile}"
-#!/usr/bin/env -S hash-bang cpp
+#!/usr/bin/env -S playbook cpp
 
 #include <iostream>
 #include <string>
@@ -44,7 +44,7 @@ function test_python()
 {
   local tmpfile="$(mktemp test_XXXX).py"
   cat << EOF > "${tmpfile}"
-#!/usr/bin/env -S hash-bang python
+#!/usr/bin/env -S playbook python
 
 import sys
 
@@ -67,7 +67,7 @@ function test_rust()
 {
   local tmpfile="$(mktemp test_XXXX).rs"
   cat << EOF > "${tmpfile}"
-#!/usr/bin/env -S hash-bang rust
+#!/usr/bin/env -S playbook rust
 
 use std::env;
 use std::process;

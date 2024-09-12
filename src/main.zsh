@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 
 # TODO Move this to `src/common.zsh`
-NAME="hash-bang"
+NAME="playbook"
 
 BASE_PATH=${0:A:h:h} # ':A' gives the pathname, ':h' gives the parent
 CACHE_PATH="${HOME}/.cache/${NAME}"

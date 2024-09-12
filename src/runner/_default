@@ -9,7 +9,7 @@ TAG_BUILD="build"
 TAG_RUN="run"
 TAG_CLEANUP="cleanup"
 
-TAG_SRC_FILE="{src_file}" # The source script, but without hash-bang stanza
+TAG_SRC_FILE="{src_file}" # The source script, but without playbook stanza
 TAG_OUT_PATH="{out_path}" # The output path, cached
 TAG_OUT_EXECUTABLE="{out_executable}" # The output executable
 TAG_ARGS="{args}" # The recipient program arguments
@@ -43,9 +43,9 @@ function run_script_default()
   local script_cleanup_stanza="$(extract_script_stanza ${TAG_CLEANUP})"
   # TODO Other script-specific stanzas as well, i.e. lint/perf-test
 
-  # Extract a clean source file (without any hash-bang stanza)
-  # Replace the first line (containing hash-bang) by an empty line
-  # Replace any hash-bang stanzas by equivalent number of empty lines
+  # Extract a clean source file (without any playbook stanza)
+  # Replace the first line (containing playbook) by an empty line
+  # Replace any playbook stanzas by equivalent number of empty lines
   # This allow stable reference of compile/run errors to source code
   mkdir -p "${out_path}"
   sed '1s/.*//g' ${script_file} \

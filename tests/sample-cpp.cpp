@@ -1,4 +1,4 @@
-#!/usr/bin/env -S hash-bang cpp
+#!/usr/bin/env -S playbook cpp
 
 // This source code file can be launched directly.
 // Behind the scene, the default compiler is used to build the binary code
