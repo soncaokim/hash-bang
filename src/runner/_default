@@ -51,6 +51,8 @@ function run_script_default()
   sed '1s/.*//g' ${script_file} \
     | sed "s/^.*${NAME}:.*$//g" \
     > ${src_file}
+  # Carry over the executable bit (for shell and other scripts)
+  [ -x "${script_file}" ] && chmod +x "${src_file}"
 
   # Override default if the script contains a specific stanza
   run_stanza="cd ${out_path}; ${run_stanza}"
