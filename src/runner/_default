@@ -4,10 +4,14 @@ source "${BASE_PATH}/src/lib/hash"
 source "${BASE_PATH}/src/lib/logging"
 zmodload zsh/datetime
 
-TAG_SETUP="setup"
-TAG_BUILD="build"
-TAG_RUN="run"
-TAG_CLEANUP="cleanup"
+TAG_SETUP_A="pre-setup"
+TAG_SETUP_Z="post-setup"
+TAG_BUILD_A="pre-build"
+TAG_BUILD_Z="post-build"
+TAG_RUN_A="pre-run"
+TAG_RUN_Z="post-run"
+TAG_CLEANUP_A="pre-cleanup"
+TAG_CLEANUP_Z="post-cleanup"
 
 TAG_SRC_FILE="{src_file}" # The source script, but without playbook stanza
 TAG_OUT_PATH="{out_path}" # The output path, cached
@@ -37,11 +41,14 @@ function run_script_default()
   }
 
   # Extract the script-specific stanzas
-  local script_setup_stanza="$(extract_script_stanza ${TAG_SETUP})"
-  local script_build_stanza="$(extract_script_stanza ${TAG_BUILD})"
-  local script_run_stanza="$(extract_script_stanza ${TAG_RUN})"
-  local script_cleanup_stanza="$(extract_script_stanza ${TAG_CLEANUP})"
-  # TODO Other script-specific stanzas as well, i.e. lint/perf-test
+  local script_setup_stanza_A="$(extract_script_stanza ${TAG_SETUP_A})"
+  local script_setup_stanza_Z="$(extract_script_stanza ${TAG_SETUP_Z})"
+  local script_build_stanza_A="$(extract_script_stanza ${TAG_BUILD_A})"
+  local script_build_stanza_Z="$(extract_script_stanza ${TAG_BUILD_Z})"
+  local script_run_stanza_A="$(extract_script_stanza ${TAG_RUN_A})"
+  local script_run_stanza_Z="$(extract_script_stanza ${TAG_RUN_Z})"
+  local script_cleanup_stanza_A="$(extract_script_stanza ${TAG_CLEANUP_A})"
+  local script_cleanup_stanza_Z="$(extract_script_stanza ${TAG_CLEANUP_Z})"
 
   # Extract a clean source file (without any playbook stanza)
   # Replace the first line (containing playbook) by an empty line
@@ -55,11 +62,17 @@ function run_script_default()
   [ -x "${script_file}" ] && chmod +x "${src_file}"
 
   # Override default if the script contains a specific stanza
-  run_stanza="cd ${out_path}; ${run_stanza}"
-  [[ -n "${script_setup_stanza}" ]] && setup_stanza="${setup_stanza}; ${script_setup_stanza}"
-  [[ -n "${script_build_stanza}" ]] && build_stanza="${build_stanza}; ${script_build_stanza}"
-  [[ -n "${script_run_stanza}" ]] && run_stanza="${run_stanza}; ${script_run_stanza}"
-  [[ -n "${script_cleanup_stanza}" ]] && cleanup_stanza="${cleanup_stanza}; ${script_cleanup_stanza}"
+  function skip_empty_stanzas()
+  {
+    while read -r line; do
+      [[ -n "${line}" ]] && echo "${line}; "
+    done
+  }
+
+  setup_stanza="$({echo "${script_setup_stanza_A}"; echo "${setup_stanza}"; echo "${script_setup_stanza_Z}"} | skip_empty_stanzas)"
+  build_stanza="$({echo "${script_build_stanza_A}"; echo "${build_stanza}"; echo "${script_build_stanza_Z}"} | skip_empty_stanzas)"
+  run_stanza="$({echo "${script_run_stanza_A}"; echo "cd ${out_path}"; echo "${run_stanza}"; echo "${script_run_stanza_Z}"} | skip_empty_stanzas)"
+  cleanup_stanza="$({echo "${script_cleanup_stanza_A}"; echo "${cleanup_stanza}"; echo "${script_cleanup_stanza_Z}"} | skip_empty_stanzas)"
 
   function execute_stanza()
   {
