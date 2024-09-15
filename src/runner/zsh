@@ -1,0 +1,13 @@
+# Specialized runner for zsh scripts
+
+source "${BASE_PATH}/src/runner/_default"
+
+function run_script_specialized()
+{
+  # The following variables are not local since they may be overriden by callee
+  run_stanza="zsh -c {src_file} {args}"
+
+  run_script_default $@
+}
+
+
