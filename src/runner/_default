@@ -102,6 +102,7 @@ function run_script_default()
           i=$((i+1))
         done
       }
+      local exit_code=0
       echo "${commands}" | while read command; do
         local real_command=$(echo "${command}" \
           | sed "s|{src_file}|${src_file}|g" \
@@ -109,14 +110,19 @@ function run_script_default()
           | sed "s|{out_executable}|${out_executable}|g" \
           | sed "s|{args}|${script_args_quoted}|g" \
         )
-        #log_info "${NAME} > ${real_command}"
+        log_info "${NAME} > ${real_command}"
         eval ${real_command}
+
+        exit_code=$?
+        (( exit_code != 0 )) && break
       done
 
       # Logging
       local timestamp_Z
       typeset -F timestamp_Z=${EPOCHREALTIME}
       echo "${step_name};${timestamp_A};$(( timestamp_Z - timestamp_A ));${script_cwd};${script_file};${script_args}" >> ${out_path}/${LOG_FILE}
+
+      return ${exit_code}
     fi
   }
 
