@@ -110,7 +110,7 @@ function run_script_default()
           | sed "s|{out_executable}|${out_executable}|g" \
           | sed "s|{args}|${script_args_quoted}|g" \
         )
-        log_info "${NAME} > ${real_command}"
+        #log_info "${NAME} > ${real_command}"
         eval ${real_command}
 
         exit_code=$?
