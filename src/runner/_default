@@ -1,7 +1,9 @@
+[ -n "${playbook_runner_default_loaded}" ] && return || readonly playbook_runner_default_loaded=yes
+
 # Default runner
 
-source "${BASE_PATH}/src/lib/hash"
-source "${BASE_PATH}/src/lib/logging"
+source "${BASE_PATH}/src/lib/hash.zsh"
+source "${BASE_PATH}/src/lib/logging.zsh"
 zmodload zsh/datetime
 
 TAG_SETUP_A="pre-setup"
@@ -80,7 +82,7 @@ function run_script_default()
     shift
     local commands=$@
     if [[ -n "${commands}" ]]; then
-      # Logging, without the duration
+      # Book keeping, without the duration
       local timestamp_A
       typeset -F timestamp_A=${EPOCHREALTIME}
       echo "${step_name};${timestamp_A};;${script_cwd};${script_file};${script_args}" >> ${out_path}/${LOG_FILE}
@@ -110,14 +112,14 @@ function run_script_default()
           | sed "s|{out_executable}|${out_executable}|g" \
           | sed "s|{args}|${script_args_quoted}|g" \
         )
-        #log_info "${NAME} > ${real_command}"
+        log_debug "${NAME} > ${real_command}"
         eval ${real_command}
 
         exit_code=$?
         (( exit_code != 0 )) && break
       done
 
-      # Logging
+      # Book keeping
       local timestamp_Z
       typeset -F timestamp_Z=${EPOCHREALTIME}
       echo "${step_name};${timestamp_A};$(( timestamp_Z - timestamp_A ));${script_cwd};${script_file};${script_args}" >> ${out_path}/${LOG_FILE}
@@ -150,3 +152,4 @@ function run_script_default()
     && execute_stanza cleanup ${cleanup_stanza}
 }
 
+# vim: set filetype=zsh :

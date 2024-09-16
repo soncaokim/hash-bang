@@ -1,3 +1,5 @@
+[ -n "${playbook_runner_zsh_loaded}" ] && return || readonly playbook_runner_zsh_loaded_loaded=yes
+
 # Specialized runner for zsh scripts
 
 source "${BASE_PATH}/src/runner/_default"
@@ -9,5 +11,4 @@ function run_script_specialized()
 
   run_script_default $@
 }
-
 

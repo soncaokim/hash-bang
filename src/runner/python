@@ -1,3 +1,5 @@
+[ -n "${playbook_runner_python_loaded}" ] && return || readonly playbook_runner_python_loaded=yes
+
 # Specialized runner for Python
 
 source "${BASE_PATH}/src/runner/_default"
@@ -16,4 +18,4 @@ function run_script_specialized()
   run_script_default $@
 }
 
-
+# vim: set filetype=zsh :
