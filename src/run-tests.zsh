@@ -4,7 +4,6 @@ source "${BASE_PATH}/src/lib/logging.zsh"
 
 source "${BASE_PATH}/src/common.zsh"
 
-# TODO Move this to `src/run-tests.zsh`
 function run_tests()
 {
   log_info "${NAME}: Running self-tests..."
