@@ -10,8 +10,18 @@ function run_script_specialized()
   setup_stanza="python3 -m venv {out_path};"
   setup_stanza+="source {out_path}/bin/activate"
 
-  run_stanza="source {out_path}/bin/activate;"
-  run_stanza+="python3 {src_file} {args}"
+  # TODO Have this check in the cleanup functions too
+  # If the python binary installed in the env if obsolete, raise warning and force setup steps by obliterating the setup guard file
+  run_stanza="""
+    [ ! -x {out_path}/bin/python3 ] && { \
+      log_error '${NAME}: python venv is not sane (the python3 binary is not executable)'; \
+      rm -rf {out_path}/* ; \
+      log_error '${NAME}: Please relaunch to reset the venv'; \
+    } || { \
+      source {out_path}/bin/activate; \
+      python3 {src_file} {args}; \
+    }\
+"""
 
   cleanup_stanza="deactivate"
 
